@@ -1,0 +1,44 @@
+Description de l'algorithme :
+
+new_p est le pair que l'on souhaite insérer avec l'identifiant id_new dans la DHT CHORD. Il ne peut contacter que le pair init_p.
+
+    1. Trouver le successeur:
+        new_p demande quel est son successeur à init_p. La demande circule dans le réseau en utilisant l'algorithme de lookup des finger table.
+        chaque pair transfère la demande s'il ne connait pas son successeur.
+        une fois succ_p trouvé, new_p en est informé.
+
+    2. Initialiser les informations
+        new_p contacte succ_p pour connaitre son prédécesseur pred_p et maj.
+        new_p informe p_pred qu'il est son nouveau successeur et maj.
+        new_p notifie succ_p qu'il est son nouveau prédécesseur et maj.
+
+    3. Construire la finger table de new_p
+        Pour chaque entrée de la finger table, new_p calcul la target et envoie une demande à succ_p de trouver le successeur de la target avec
+        l'algorithme de lookup classique des finger table.
+        La réponse est ensuite stocké dans la finger_table.
+
+    4. Mise à jour des finger tables des autres pairs
+        Parcours les listes inverse de pred_p et succ_p pour déterminé si il doit y avoir des modifications.
+        Si new_p remarque qu'il devrait maintenant pointé par une des entrée de ces tables il le signal pour faire la mise à jour.
+
+
+Correction de l'algorithme:
+    Initialement on a une structure ne anneau avec chaque pair qui possede un id, pred_p, succ_p, finger table et inverse cohérent.
+
+    Après l'étape 2, les valeurs de pred_p et succ_p de new_p et de son successeur / prédécesseur sont cohérente.
+    L'étape 3 et 4 assure que la finger table de new_p ainsi que celle de tous les pairs conerné par la modifications sont mise à jour.
+    Les listes inverse sont elles aussi modifiée lors de la mise à jour des finger tables.
+
+    On conserve bien un reseau en anneau cohérent.
+
+
+Compléxité en nombre de messages:
+
+    1. Recherche du successeur en O(log N).
+    2. Initialisation des informations en O(1);
+    3. Construire la finger table en O(M * log N) car une recherche par entrée de la table.
+    4. Mise à jour des finger tabble des autres pairs en O(log N), seulement les pairs concerné par la modifications.
+
+    Total = O(log N) + O(1) + O(M × log N) + O(log N)
+          = O(log^2 N) en considérant que M = log N.
+          < O(|N|)

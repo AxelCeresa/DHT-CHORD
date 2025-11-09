@@ -1,0 +1,39 @@
+Description de l'algorithme:
+    La première étape de l'algorithme consite à élire un leader parmis l'ensemble non nul quelconque de pairs déterminé par le simulateur.
+    Ce leader sera chargé de récupérer l'id et de calculer les finger tables de chacun de ses pairs.
+    La DHT étant initialement organisé en anneau bidirectionnel, l'algorithme de Hirschberg & Sinclair est adapté pour élire un leader en O(NlogN).
+    Le leader s'annonce dans l'anneau puis calcul la finger table de chacun de ses pairs et lui envoi.
+
+    On a donc:
+        1. Election de leader (Hirschberg & Sinclair).
+        2. Annonce du leader (parcours de l'anneau).
+        3. Récupération des id par le leader (parcours de l'anneau).
+        4. Calcul des finger tables par le leader.
+        5. Envoi des finger tables au pairs (parcours de l'anneau).
+
+
+Correction de l'algorithme:
+    L'algorithme de Hirschberg & Sinclair assure l'élection d'un leader dans un anneau bidirectionnel en un nombre de ronde fini. Le pairs ayant le plus
+    grand identifiant parmis les condidats est forcément désigné leader.
+    L'annonce du leader est un simple message parcourants l'anneau transmis de successeur à successeur. Chaque pair connait maintenant le leader du reseau.
+    De la même manière le leader récupère l'id de tous les pairs à l'aide d'un message circulant dans l'anneau. Chaque pair y ajoute son identifiant avant
+    de le transmettre à son successeur jusqu'a revenir au leader.
+
+    Le leader dispose maintenant de tous les informations nécessaire afin de calculer la finger table de chacun de ses pairs.
+    Une fois calculées, l'ensemble des finger tables circulent dans l'anneau et sont récupérer par les pairs respectif.
+
+    On obtient donc bien une DHT CHORD initialisé de manière distribué sans l'intervention du simulateur et chacun des pairs dispose de sa finger table
+    calculée par le leader.
+
+    La structure en anneau de la DHT est alors cohérente.
+
+
+Complexité de l'algorithme:
+    1. La complexité en nombre de message de l'algorithmede Hirschberg & Sinclair pour l'élection du leader est O(N * log N).
+    2. 3. et 5. L'annonce du leader, la récupération des ids et l'envoi des finger tables ont tous les 3 une complexité en nombre de message en O(N).
+    4. Le calcul des finger table en O(1).
+
+    Total = O(N* log N) + O(N) + O(N) + O(1) + O(N)
+          = O(N * log N + 3N)
+          = O(N * log N)
+          < O(N^2)
